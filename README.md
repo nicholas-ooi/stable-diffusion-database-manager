@@ -1,6 +1,6 @@
 # Stable Diffusion Database Manager
 
-![Project logo]("./README_images/stable-diffusion-database-manager-logo.png")  
+![Project logo](README_images/stable-diffusion-database-manager-logo.png)  
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -10,7 +10,7 @@
 
 ## Introduction
 
-![Introductory image]("./README_images/stable-diffusion-database-manager-1.png") <!-- Replace with your introductory image -->
+![Introductory image](README_images/stable-diffusion-database-manager-1.png) <!-- Replace with your introductory image -->
 
 Stable Diffusion Database Manager named Nex is a Stable Diffusion extension.  
 It supports generating of a single or in batches of images that will be inserted into a single or multiple databases.  
@@ -32,19 +32,19 @@ Suggest to use neo4j + IPFS for such case, since IPFS is known for high availabi
 
 ### MySQL Demonstration Screenshot
 
-![MySQL Demonstration Screenshot]("./README_images/stable-diffusion-database-manager-2.png")   
+![MySQL Demonstration Screenshot](README_images/stable-diffusion-database-manager-2.png)   
 
 ### PostgreSQL Demonstration Screenshot
 
-![PostgreSQL Demonstration Screenshot]("./README_images/stable-diffusion-database-manager-3.png")   
+![PostgreSQL Demonstration Screenshot](README_images/stable-diffusion-database-manager-3.png)   
 
 ### Neo4J + IPFS Demonstration Screenshot
 
-![Neo4J + IPFS Demonstration Screenshot]("./README_images/stable-diffusion-database-manager-4.png")   
+![Neo4J + IPFS Demonstration Screenshot](README_images/stable-diffusion-database-manager-4.png)   
 
 ### MongoDB Demonstration Screenshot
 
-![MongoDB Demonstration Screenshot]("./README_images/stable-diffusion-database-manager-5.png")   
+![MongoDB Demonstration Screenshot](README_images/stable-diffusion-database-manager-5.png)   
 
 
 ## Usage
