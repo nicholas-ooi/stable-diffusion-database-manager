@@ -1,0 +1,6 @@
+SQLAlchemy
+mysql-connector-python 
+psycopg2-binary
+pymongo
+neo4j
+ipfshttpclient
