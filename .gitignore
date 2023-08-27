@@ -1,0 +1,4 @@
+test/ipfs_data
+test/ipfs_staging
+test/neo4j_data
+test/neo4j_logs
