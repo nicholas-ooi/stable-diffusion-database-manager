@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  test-mysql-nex:
+    image: mysql:5.7
+    container_name: test-mysql-nex
+    environment:
+      MYSQL_ROOT_PASSWORD: your_password
+    ports:
+      - "3306:3306"
+
+  test-postgresql-nex:
+    image: postgres:latest
+    container_name: test-postgresql-nex
+    environment:
+      POSTGRES_PASSWORD: your_password
+    ports:
+      - "5432:5432"
+
+  test-mongodb-nex:
+    image: mongo:latest
+    container_name: test-mongodb-nex
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: your_password
+    ports:
+      - "27017:27017"
+    networks:
+      - mongo-network
+
+  mongo-express-nex:
+    image: mongo-express
+    container_name: mongo-express-nex
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: your_password
+      ME_CONFIG_MONGODB_SERVER: test-mongodb-nex
+    ports:
+      - "8081:8081"
+    networks:
+      - mongo-network
+    depends_on:
+      - test-mongodb-nex
+
+  adminer-container:
+    image: adminer
+    container_name: adminer-container
+    ports:
+      - "8085:8080"
+
+  neo4j-test-nex:
+    image: neo4j:latest
+    container_name: neo4j-test-nex
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/your_password
+    volumes:
+      - ./neo4j_data:/data
+      - ./neo4j_logs:/logs
+  
+  test-ipfs-nex:
+    image: ipfs/go-ipfs:v0.7.0
+    container_name: test-ipfs-nex
+    ports:
+      - "5001:5001"
+      - "8080:8080"
+    volumes:
+      - ./ipfs_data:/data/ipfs
+      - ./ipfs_staging:/export
+
+networks:
+  mongo-network:
+    driver: bridge
