@@ -88,7 +88,7 @@ class PostgresDatabase:
 
     def insert(self, processed, input_values):
 
-        connection_string, table_name, image_metadata_column, image_bytes_column = input_values[1:4]
+        connection_string, table_name, image_metadata_column, image_bytes_column = input_values[1:5]
 
         self.instance(connection_string)
 
