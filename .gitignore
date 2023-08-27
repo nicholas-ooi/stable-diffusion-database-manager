@@ -1,4 +1,4 @@
-test/ipfs_data
-test/ipfs_staging
-test/neo4j_data
-test/neo4j_logs
+scripts/test/ipfs_data
+scripts/test/ipfs_staging
+scripts/test/neo4j_data
+scripts/test/neo4j_logs
