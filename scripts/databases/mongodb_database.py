@@ -79,7 +79,7 @@ class MongoDBDatabase:
 
     def insert(self, processed, input_values):
 
-        connection_string, db_name, collection_name = input_values[1:3]
+        connection_string, db_name, collection_name = input_values[1:4]
 
         self.instance(connection_string, db_name)
         collection = self.database[collection_name]

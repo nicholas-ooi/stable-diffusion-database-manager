@@ -8,6 +8,7 @@ services:
       MYSQL_ROOT_PASSWORD: your_password
     ports:
       - "3306:3306"
+    restart: always
 
   test-postgresql-nex:
     image: postgres:latest
@@ -16,6 +17,7 @@ services:
       POSTGRES_PASSWORD: your_password
     ports:
       - "5432:5432"
+    restart: always
 
   test-mongodb-nex:
     image: mongo:latest
@@ -27,6 +29,7 @@ services:
       - "27017:27017"
     networks:
       - mongo-network
+    restart: always
 
   mongo-express-nex:
     image: mongo-express
@@ -41,16 +44,18 @@ services:
       - mongo-network
     depends_on:
       - test-mongodb-nex
+    restart: always
 
   adminer-container:
     image: adminer
     container_name: adminer-container
     ports:
       - "8085:8080"
+    restart: always      
 
-  neo4j-test-nex:
+  test-neo4j-nex:
     image: neo4j:latest
-    container_name: neo4j-test-nex
+    container_name: test-neo4j-nex
     ports:
       - "7474:7474"
       - "7687:7687"
@@ -59,7 +64,8 @@ services:
     volumes:
       - ./neo4j_data:/data
       - ./neo4j_logs:/logs
-  
+    restart: always
+
   test-ipfs-nex:
     image: ipfs/go-ipfs:v0.7.0
     container_name: test-ipfs-nex
@@ -69,7 +75,8 @@ services:
     volumes:
       - ./ipfs_data:/data/ipfs
       - ./ipfs_staging:/export
-
+    restart: always
+    
 networks:
   mongo-network:
     driver: bridge
