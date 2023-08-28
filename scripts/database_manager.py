@@ -32,7 +32,7 @@ import inspect
 
 class DatabaseManagerNex(scripts.Script):
 
-    package_name = 'extensions.database_manager.scripts.databases'
+    package_name = 'extensions.stable-diffusion-database-manager.scripts.databases'
 
     databases = None
 
@@ -94,22 +94,23 @@ class DatabaseManagerNex(scripts.Script):
 
     def postprocess(self, p, processed, *args):
 
-        try:
-        
-            selected_databases_from_checkboxes = args[-1]
-            grouped_database_values = {}
-            start_index = 0
-            
-            for database in self.databases.values():
 
+        selected_databases_from_checkboxes = args[-1]
+        grouped_database_values = {}
+        start_index = 0
+        
+        for database in self.databases.values():
+
+            try:
+    
                 end_index = start_index + len(database.components)
                 grouped_database_values[database.name] = args[start_index:end_index]
                 start_index = end_index
 
                 if database.name in selected_databases_from_checkboxes:
-                    database.insert(processed, grouped_database_values[database.name])     
+                    database.insert(processed, grouped_database_values[database.name])
+                    
+            except Exception as e:
+                print(f"Error after post processing: {str(e)}")
 
-        except Exception as e:
-            return f"Error after post processing: {str(e)}"     
-        
         return True
