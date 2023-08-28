@@ -26,7 +26,7 @@ SOFTWARE.
 
 import launch
 
-with open('requirements.txt', 'r') as f:
+with open('./extensions/stable-diffusion-database-manager/requirements.txt', 'r') as f:
     required_packages = [line.strip() for line in f.readlines() if line.strip()]
 
 for package in required_packages:
