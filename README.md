@@ -21,6 +21,7 @@ It supports 4 different types of databases such as:
 1. Postgres (RDBMS, SQL)
 1. Neo4j + IPFS (Graph, CQL)
 1. MongoDB (Document, NoSQL)
+1. SQlite (**new**)
 
 ### Use Cases
 
@@ -46,6 +47,9 @@ Suggest to use neo4j + IPFS for such case, since IPFS is known for high availabi
 
 ![MongoDB Demonstration Screenshot](README_images/stable-diffusion-database-manager-5.png)   
 
+### SQlite Demonstration Screenshot
+
+![SQlite Demonstration Screenshot](README_images/stable-diffusion-database-manager-6.png)   
 
 ## Usage
 
@@ -72,9 +76,11 @@ Alternatively, is to git clone or download this repository and place everything 
 
 ### Using the extension
 When setting up and selecting one or more databases  
-Check the connection String and ensure the database schema is created.   
+Check the connection String and ensure the database schema is created.  
 Always hit the test connectivity button to ensure the extension is able to connect with the respective database before inserting the images.  
 Tables, columns, and collections are created on the fly if they do ``not exist`` in the database when images are generated.  
+
+Refer to **Test and Adminer UI** to access the various database types to create a database.
 
 ## Test
 
@@ -84,8 +90,9 @@ Docker will install various images, docker networks, and setup containers such a
 1. MySQL 5.7
 1. PostgresSQL latest
 1. Mongodb latest
-1. adminer, access MySQL and PostgresSQL Web based Database UI at (http://127.0.0.1:8085/)
-1. neo4j latest, access neo4j UI at (http://127.0.0.1:7474)
+1. Mongo express, access MongoDB web based database UI at (http://localhost:8081/) 
+1. Adminer, access MySQL and PostgresSQL Web based Database UI at (http://127.0.0.1:8085/)
+1. Neo4j latest, access neo4j UI at (http://127.0.0.1:7474)
 1. IPFS 0.7.0, access IPFS UI at (http://127.0.0.1:5001/webui/)
 ---
 Run the test by executing docker-compose
@@ -97,13 +104,26 @@ docker-compose up -d
 ```
 The above command will download and install all relevant docker containers  
 
-The credentials (username and password) can be found at ``scripts/test/docker-compose.yml``
+The credentials **(username and password)** can be found at ``scripts/test/docker-compose.yml``
 
 Please change and secure the credentials.
 
-When using Adminer UI   
-For Windows and Mac, the credentials input for server will be: ``host.docker.internal``  
-For Linux, the ip address from ```ip route | awk 'NR==1 {print $3}'```
+**When using Adminer UI**  
+
+The default username for MySql is **root**  
+The default username for PostgreSql is **postgres**  
+
+For Windows and Mac  
+The **Server** input box will be: ``host.docker.internal``  
+
+For Linux  
+Run the command ```ip route | awk 'NR==1 {print $3}'```  
+Copy the ip address and paste it into the **Server** input box  
+
+**Testing SQLite**  
+Use any Sqlite tools to view the sqlite db file.  
+https://inloop.github.io/sqlite-viewer/ is a good start.  
+
 ## Known Issues
 
 - Issue 1: Neo4j and IPFS are using IPFS ipfs/go-ipfs:v0.7.0, the python client for IPFS only supports up to that version.
