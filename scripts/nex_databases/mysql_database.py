@@ -26,12 +26,12 @@ SOFTWARE.
 
 import gradio as gr
 from io import BytesIO
-import re
 import json
-from sqlalchemy import create_engine, Column, String, LargeBinary, Integer, text, inspect, Table
+from sqlalchemy import create_engine, Column, Text, LargeBinary, Integer, text, inspect, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import logging
+from modules import generation_parameters_copypaste
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -101,24 +101,8 @@ class MySQLDatabase:
             raise e
         
         for i in range(len(processed.images)):
-            regex = r"Steps:.*$"
-            info = re.findall(regex, processed.info, re.M)[0]
-            input_dict = dict(item.split(": ") for item in str(info).split(", "))
 
-            details = {
-                "seed": processed.seed,
-                "prompt": processed.prompt,
-                "neg_prompt": processed.negative_prompt,
-                "steps": int(input_dict["Steps"]),
-                "seed": int(input_dict["Seed"]),
-                "sampler": input_dict["Sampler"],
-                "cfg_scale": float(input_dict["CFG scale"]),
-                "size": tuple(map(int, input_dict["Size"].split("x"))),
-                "model_hash": input_dict["Model hash"],
-                "model": input_dict["Model"]
-            }
-
-            metadata = json.dumps(details)
+            metadata = json.dumps(generation_parameters_copypaste.parse_generation_parameters(processed.infotexts[i]))
 
             image = processed.images[i]
             buffer = BytesIO()
@@ -139,7 +123,6 @@ class MySQLDatabase:
                 raise e
             finally:
                  self.session_instance.close()
-
 
     def close(self):
         if self.connection:
@@ -168,7 +151,7 @@ class MySQLDatabase:
             {
                 '__tablename__': tbl_name,
                 'id': Column(Integer, primary_key=True, index=True, autoincrement=True),
-                column1_name: Column(String(255)),
+                column1_name: Column(Text),
                 column2_name: Column(LargeBinary(length=4294967295))
             }
         )

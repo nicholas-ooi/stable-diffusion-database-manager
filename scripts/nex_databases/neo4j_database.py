@@ -25,7 +25,6 @@ SOFTWARE.
 """
 
 import gradio as gr
-import re
 import os
 import json
 import logging
@@ -35,6 +34,7 @@ import tempfile
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+from modules import generation_parameters_copypaste
 
 class Neo4jDatabase:
 
@@ -88,24 +88,8 @@ class Neo4jDatabase:
         try:
             with ipfshttpclient.connect() as client:
                 for i in range(len(processed.images)):
-                    regex = r"Steps:.*$"
-                    info = re.findall(regex, processed.info, re.M)[0]
-                    input_dict = dict(item.split(": ") for item in str(info).split(", "))
 
-                    details = {
-                        "seed": processed.seed,
-                        "prompt": processed.prompt,
-                        "neg_prompt": processed.negative_prompt,
-                        "steps": int(input_dict["Steps"]),
-                        "seed": int(input_dict["Seed"]),
-                        "sampler": input_dict["Sampler"],
-                        "cfg_scale": float(input_dict["CFG scale"]),
-                        "size": tuple(map(int, input_dict["Size"].split("x"))),
-                        "model_hash": input_dict["Model hash"],
-                        "model": input_dict["Model"]
-                    }
-
-                    metadata = json.dumps(details)
+                    metadata = json.dumps(generation_parameters_copypaste.parse_generation_parameters(processed.infotexts[i]))
 
                     image = processed.images[i]
                     
