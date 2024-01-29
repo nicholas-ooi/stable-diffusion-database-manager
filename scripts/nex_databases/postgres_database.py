@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 
+
 class PostgresDatabase:
 
     name = "PostgreSQL"
@@ -45,15 +46,15 @@ class PostgresDatabase:
     session_instance = None
     components = None
 
-    header = gr.Label(label=name, value=name, visible=False)
-    connection_string = gr.Textbox(label="Connection String", visible=False, placeholder="postgresql://postgres:your_password@localhost:5432/your_database_name")
-    table_name = gr.Textbox(label="Table Name", visible=False, placeholder="Provide the name of the table")
-    image_metadata_column = gr.Textbox(label="Image Metadata Column Name", visible=False, placeholder="Provide the name of the column that stores the image metadata details")
-    image_bytes_column = gr.Textbox(label="Image Bytes Column Name", visible=False, placeholder="Provide the name of the column that stores the image")
-    connection_result_textarea = gr.TextArea(interactive=False, label='Connection Result', visible=False)
-    test_button = gr.Button(value="Test Connection", visible=False)
-
     def __init__(self):
+        self.header = gr.Label(label=self.name, value=self.name, visible=False)
+        self.connection_string = gr.Textbox(label="Connection String", visible=False, placeholder="postgresql://postgres:your_password@localhost:5432/your_database_name")
+        self.table_name = gr.Textbox(label="Table Name", visible=False, placeholder="Provide the name of the table")
+        self.image_metadata_column = gr.Textbox(label="Image Metadata Column Name", visible=False, placeholder="Provide the name of the column that stores the image metadata details")
+        self.image_bytes_column = gr.Textbox(label="Image Bytes Column Name", visible=False, placeholder="Provide the name of the column that stores the image")
+        self.connection_result_textarea = gr.TextArea(interactive=False, label='Connection Result', visible=False)
+        self.test_button = gr.Button(value="Test Connection", visible=False)
+
         self.bind_event_handlers()
         self.components = [
             self.header,
