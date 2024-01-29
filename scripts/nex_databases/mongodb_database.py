@@ -28,10 +28,11 @@ import gradio as gr
 from pymongo import MongoClient
 from io import BytesIO
 import logging
+from modules import generation_parameters_copypaste
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-from modules import generation_parameters_copypaste
+
 
 class MongoDBDatabase:
 
@@ -40,14 +41,14 @@ class MongoDBDatabase:
     database = None
     components = None
 
-    header = gr.Label(label=name, value=name, visible=False)
-    connection_string = gr.Textbox(label="Connection String", visible=False, placeholder="mongodb://root:your_password@localhost:27017/")
-    database_name = gr.Textbox(label="Database Name", visible=False, placeholder="Provide the name of the database")
-    collection_name = gr.Textbox(label="Collection Name", visible=False, placeholder="Provide the name of the collection")
-    connection_result_textarea = gr.TextArea(interactive=False, label='Connection Result', visible=False)
-    test_button = gr.Button(value="Test Connection", visible=False)
-
     def __init__(self):
+        self.header = gr.Label(label=self.name, value=self.name, visible=False)
+        self.connection_string = gr.Textbox(label="Connection String", visible=False, placeholder="mongodb://root:your_password@localhost:27017/")
+        self.database_name = gr.Textbox(label="Database Name", visible=False, placeholder="Provide the name of the database")
+        self.collection_name = gr.Textbox(label="Collection Name", visible=False, placeholder="Provide the name of the collection")
+        self.connection_result_textarea = gr.TextArea(interactive=False, label='Connection Result', visible=False)
+        self.test_button = gr.Button(value="Test Connection", visible=False)
+
         self.bind_event_handlers()
         self.components = [
             self.header,
