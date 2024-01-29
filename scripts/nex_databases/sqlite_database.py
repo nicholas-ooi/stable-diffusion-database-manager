@@ -123,7 +123,7 @@ class SQLiteDatabase:
                 logger.error(f"Error inserting data: {e}")
                 raise e
             finally:
-                 self.session_instance.close()
+                self.session_instance.close()
 
     def close(self):
         if self.connection:
