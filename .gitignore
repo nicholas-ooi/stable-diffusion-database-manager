@@ -2,5 +2,4 @@ scripts/test/ipfs_data
 scripts/test/ipfs_staging
 scripts/test/neo4j_data
 scripts/test/neo4j_logs
-scripts/__pycache__/*
-scripts/databases/__pycache__/*
+__pycache__/

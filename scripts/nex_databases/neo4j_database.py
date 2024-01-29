@@ -121,7 +121,6 @@ class Neo4jDatabase:
             temp_file.close()
             os.remove(temp_file.name)
 
-
     def close(self):
         if self.session_instance:
             self.session_instance.close()

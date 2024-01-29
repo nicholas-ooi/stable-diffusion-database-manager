@@ -31,8 +31,6 @@ from scripts import nex_databases
 
 class DatabaseManagerNex(scripts.Script):
 
-    package_name = 'scripts.nex_databases'
-
     def __init__(self):
         super().__init__()
         self.databases = {}
@@ -83,7 +81,6 @@ class DatabaseManagerNex(scripts.Script):
         return database_ui_components
 
     def postprocess(self, p, processed, *args):
-
 
         selected_databases_from_checkboxes = args[-1]
         grouped_database_values = {}
