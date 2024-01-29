@@ -26,50 +26,23 @@ SOFTWARE.
 
 import modules.scripts as scripts
 import gradio as gr
-import importlib
-import pkgutil
-import inspect
-import os
-import sys
+from scripts import nex_databases
+
+
 class DatabaseManagerNex(scripts.Script):
 
-    package_name = 'nex_databases'
-
-    databases = None
+    package_name = 'scripts.nex_databases'
 
     def __init__(self):
         super().__init__()
         self.databases = {}
-
-    def get_absolute_path(self, relative_path):
-        current_script_dir = os.path.dirname(__file__)
-        absolute_path = os.path.join(current_script_dir, relative_path)
-        return absolute_path
-    
-    def add_module_path(self, module_path):
-        module_dir = os.path.dirname(module_path)
-        if module_dir not in sys.path:
-            sys.path.insert(0, module_dir)
-
-    def import_module_from_path(self, relative_path):
-        absolute_path = self.get_absolute_path(relative_path)
-        self.add_module_path(absolute_path)
-        module_name = os.path.splitext(os.path.basename(absolute_path))[0]
-        module = importlib.import_module(module_name)
-        return module
+        self.databases_1 = {}
 
     def initialise_database_names(self):
 
-        package = self.import_module_from_path(self.package_name)
-        for _, module_name, _ in pkgutil.iter_modules(package.__path__):
-
-            module = importlib.import_module(f"{self.package_name}.{module_name}")
-
-            for _, obj in inspect.getmembers(module):
-                if inspect.isclass(obj) and obj.__module__ == module.__name__:
-                    class_instance = obj()
-                    self.databases[class_instance.name] = class_instance
-                    break
+        for database in nex_databases.all_database_classes:
+            class_instance = database()
+            self.databases[class_instance.name] = class_instance
 
     def selected_checkboxes(self, database_checkboxes_values):
         
@@ -81,7 +54,6 @@ class DatabaseManagerNex(scripts.Script):
                 ui_components_to_update.append(gr.update(visible=visibility))
 
         return ui_components_to_update
-
 
     def title(self):
         return "Database Manager Nex"
