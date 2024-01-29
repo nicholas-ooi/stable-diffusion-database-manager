@@ -31,10 +31,11 @@ import logging
 from neo4j import GraphDatabase
 import ipfshttpclient
 import tempfile
+from modules import generation_parameters_copypaste
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-from modules import generation_parameters_copypaste
+
 
 class Neo4jDatabase:
 
@@ -43,14 +44,14 @@ class Neo4jDatabase:
     session_instance = None
     components = None
 
-    header = gr.Label(label=name, value=name, visible=False)
-    connection_string = gr.Textbox(label="Connection String", visible=False, placeholder="bolt://localhost:7687")
-    user_name = gr.Textbox(label="Username", visible=False, placeholder="neo4j")
-    password = gr.Textbox(label="Password", visible=False, placeholder="Provide your password", type="password")
-    connection_result_textarea = gr.TextArea(interactive=False, label='Connection Result', visible=False)
-    test_button = gr.Button(value="Test Connection", visible=False)
-
     def __init__(self):
+        self.header = gr.Label(label=self.name, value=self.name, visible=False)
+        self.connection_string = gr.Textbox(label="Connection String", visible=False, placeholder="bolt://localhost:7687")
+        self.user_name = gr.Textbox(label="Username", visible=False, placeholder="neo4j")
+        self.password = gr.Textbox(label="Password", visible=False, placeholder="Provide your password", type="password")
+        self.connection_result_textarea = gr.TextArea(interactive=False, label='Connection Result', visible=False)
+        self.test_button = gr.Button(value="Test Connection", visible=False)
+
         self.bind_event_handlers()
         self.components = [
             self.header,
@@ -81,7 +82,7 @@ class Neo4jDatabase:
             return message
 
     def insert(self, processed, input_values):
-        
+
         connection_string, user, password = input_values[1:4]
         self.instance(connection_string, user, password)
 
@@ -92,10 +93,10 @@ class Neo4jDatabase:
                     metadata = json.dumps(generation_parameters_copypaste.parse_generation_parameters(processed.infotexts[i]))
 
                     image = processed.images[i]
-                    
+
                     temp_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
                     image.save(temp_file, 'PNG')
-                    
+
                     response = client.add(temp_file.name)
                     ipfs_hash = response['Hash']
 
@@ -105,7 +106,7 @@ class Neo4jDatabase:
                     MERGE (p)-[:RELATED_TO]->(image)
                     RETURN image
                     """
-                    
+
                     self.session_instance.run(
                         cypher_query,
                         prompt_content=processed.prompt,
