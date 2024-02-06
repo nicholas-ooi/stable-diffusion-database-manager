@@ -32,6 +32,8 @@ from neo4j import GraphDatabase
 import ipfshttpclient
 import tempfile
 from modules import generation_parameters_copypaste
+from modules import shared
+from .setting_button import OptionButton
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -45,46 +47,45 @@ class Neo4jDatabase:
     components = None
 
     def __init__(self):
-        self.header = gr.Label(label=self.name, value=self.name, visible=False)
-        self.connection_string = gr.Textbox(label="Connection String", visible=False, placeholder="bolt://localhost:7687")
-        self.user_name = gr.Textbox(label="Username", visible=False, placeholder="neo4j")
-        self.password = gr.Textbox(label="Password", visible=False, placeholder="Provide your password", type="password")
-        self.connection_result_textarea = gr.TextArea(interactive=False, label='Connection Result', visible=False)
-        self.test_button = gr.Button(value="Test Connection", visible=False)
+        shared.options_templates.update(
+            shared.options_section(
+                ('nex-databases', "Nex databases"), {
+                    f'nex_databases_enable_neo4j': shared.OptionInfo(False, 'Enable - Neo4j'),
+                    f'nex_databases_connection_string_neo4j': shared.OptionInfo(
+                        "", 'connection String - Neo4j', gr.Textbox,
+                        {'placeholder': 'bolt://localhost:7687'}
+                    ),
+                    f'nex_databases_user_name_neo4j': shared.OptionInfo("", 'Username - Neo4j'),
+                    f'nex_databases_password_neo4j': shared.OptionInfo("", 'Password - Neo4j'),
+                    f'nex_databases_test_button_neo4j': OptionButton('Test - Neo4j!', self.test_connectivity),
+                }
+            )
+        )
 
-        self.bind_event_handlers()
-        self.components = [
-            self.header,
-            self.connection_string,
-            self.user_name,
-            self.password,
-            self.connection_result_textarea,
-            self.test_button
-        ]
-
-    def bind_event_handlers(self):
-        self.test_button.click(fn=self.test_connectivity, inputs=[self.connection_string, self.user_name, self.password], outputs=[self.connection_result_textarea])
-
-    def instance(self, connection_string, user, password):
-        self.driver = GraphDatabase.driver(connection_string, auth=(user, password))
+    def instance(self):
+        self.driver = GraphDatabase.driver(
+            shared.opts.nex_databases_connection_string_neo4j,
+            auth=(shared.opts.nex_databases_user_name_neo4j, shared.opts.nex_databases_password_neo4j)
+        )
         self.session_instance = self.driver.session()
 
-    def test_connectivity(self, connection_string, user, password):
-        message = ""
+    def test_connectivity(self):
         try:
-            self.instance(connection_string, user, password)
+            self.instance()
             self.session_instance.run("RETURN 1 AS connectivity_test")
-            message = f"Connected successfully to {self.name}!\n"
+            message = f"Connected successfully to {self.name}!"
+            gr.Info(message)
         except Exception as e:
             message = f"Error connecting to {self.name}: {str(e)}"
+            gr.Warning(message)
         finally:
             self.close()
-            return message
 
-    def insert(self, processed, input_values):
+    def insert(self, processed):
+        if not shared.opts.nex_databases_enable_neo4j:
+            return
 
-        connection_string, user, password = input_values[1:4]
-        self.instance(connection_string, user, password)
+        self.instance()
 
         try:
             with ipfshttpclient.connect() as client:
