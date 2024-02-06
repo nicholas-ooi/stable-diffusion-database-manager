@@ -12,3 +12,8 @@ all_database_classes = [
     PostgresDatabase,
     SQLiteDatabase,
 ]
+
+# initialise_database_names
+databases = []
+for database in all_database_classes:
+    databases.append(database())

@@ -29,6 +29,8 @@ from pymongo import MongoClient
 from io import BytesIO
 import logging
 from modules import generation_parameters_copypaste
+from modules import shared
+from .setting_button import OptionButton
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -42,47 +44,43 @@ class MongoDBDatabase:
     components = None
 
     def __init__(self):
-        self.header = gr.Label(label=self.name, value=self.name, visible=False)
-        self.connection_string = gr.Textbox(label="Connection String", visible=False, placeholder="mongodb://root:your_password@localhost:27017/")
-        self.database_name = gr.Textbox(label="Database Name", visible=False, placeholder="Provide the name of the database")
-        self.collection_name = gr.Textbox(label="Collection Name", visible=False, placeholder="Provide the name of the collection")
-        self.connection_result_textarea = gr.TextArea(interactive=False, label='Connection Result', visible=False)
-        self.test_button = gr.Button(value="Test Connection", visible=False)
+        shared.options_templates.update(
+            shared.options_section(
+                ('nex-databases', "Nex databases"), {
+                    f'nex_databases_enable_mongodb': shared.OptionInfo(False, 'Enable MongoDB'),
+                    f'nex_databases_connection_string_mongodb': shared.OptionInfo(
+                        "", 'Connection String - MongoDB', gr.Textbox,
+                        {'placeholder': 'mongodb://root:your_password@localhost:27017/'}
+                    ),
+                    f'nex_databases_database_name_mongodb': shared.OptionInfo("", 'Database Name - MongoDB'),
+                    f'nex_databases_collection_name_mongodb': shared.OptionInfo("", 'Collection Name - MongoDB'),
+                    f'nex_databases_test_button_mongodb': OptionButton('Test - MongoDB!', self.test_connectivity),
+                }
+            )
+        )
 
-        self.bind_event_handlers()
-        self.components = [
-            self.header,
-            self.connection_string,
-            self.database_name,
-            self.collection_name,
-            self.connection_result_textarea,
-            self.test_button
-        ]
+    def instance(self):
+        self.client = MongoClient(shared.opts.nex_databases_connection_string_mongodb)
+        self.database = self.client[shared.opts.nex_databases_database_name_mongodb]
 
-    def bind_event_handlers(self):
-        self.test_button.click(fn=self.test_connectivity, inputs=[self.connection_string], outputs=[self.connection_result_textarea])
-
-    def instance(self, connection_string, db_name):
-        self.client = MongoClient(connection_string)
-        self.database = self.client[db_name]
-
-    def test_connectivity(self, connection_string):
-        message = ""
+    def test_connectivity(self):
         try:
-            self.instance(connection_string, "test_db")
+            self.instance()
             self.database.command("ping")
-            message = f"Connected successfully to {self.name}!\n"
+            message = f"Connected successfully to {self.name}!"
+            gr.Info(message)
         except Exception as e:
             message = f"Error connecting to {self.name}: {str(e)}"
+            gr.Warning(message)
         finally:
             self.close()
-            return message
 
-    def insert(self, processed, input_values):
+    def insert(self, processed):
+        if not shared.opts.nex_databases_enable_mongodb:
+            return
 
-        connection_string, db_name, collection_name = input_values[1:4]
-
-        self.instance(connection_string, db_name)
+        collection_name = shared.opts.nex_databases_collection_name_mongodb
+        self.instance()
         collection = self.database[collection_name]
 
         for i in range(len(processed.images)):
