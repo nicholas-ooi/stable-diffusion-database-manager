@@ -1,8 +1,8 @@
 """
 MIT License
 
-Copyright (c) [2023] Nicholas Ooi
-https://github.com/nicholas-ooi
+Copyright (c) [2024] w-e-w
+https://github.com/w-e-w
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +24,17 @@ SOFTWARE.
 
 """
 
-import modules.scripts as scripts
-from scripts.nex_databases import databases
+from modules import shared
+import gradio as gr
 
 
-class DatabaseManagerNex(scripts.Script):
+class OptionButton(shared.OptionInfo):
+    @staticmethod
+    def button_on_click(on_click, **kwargs):
+        button = gr.Button(**kwargs)
+        button.click(fn=on_click)
+        return button
 
-    def title(self):
-        return "Database Manager Nex"
-
-    def show(self, is_img2img):
-        return scripts.AlwaysVisible
-
-    def postprocess(self, p, processed, *args):
-        for database in databases:
-            try:
-                database.insert(processed)
-            except Exception as e:
-                print(f"Error after post processing: {str(e)}")
+    def __init__(self, text, on_button_click):
+        super().__init__(str(text).strip(), label='', component=lambda **kwargs: self.button_on_click(on_button_click, **kwargs))
+        self.do_not_save = True

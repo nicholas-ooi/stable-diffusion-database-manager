@@ -32,6 +32,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import logging
 from modules import generation_parameters_copypaste
+from modules import shared
+from .setting_button import OptionButton
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,53 +49,52 @@ class SQLiteDatabase:
     components = None
 
     def __init__(self):
-        self.header = gr.Label(label=self.name, value=self.name, visible=False)
-        self.connection_string = gr.Textbox(label="Connection String", visible=False, placeholder="sqlite:///your_database_file.db")
-        self.table_name = gr.Textbox(label="Table Name", visible=False, placeholder="Provide the name of the table")
-        self.image_metadata_column = gr.Textbox(label="Image Metadata Column Name", visible=False, placeholder="Provide the name of the column that stores the image metadata details")
-        self.image_bytes_column = gr.Textbox(label="Image Bytes Column Name", visible=False, placeholder="Provide the name of the column that stores the image")
-        self.connection_result_textarea = gr.TextArea(interactive=False, label='Connection Result', visible=False)
-        self.test_button = gr.Button(value="Test Connection", visible=False)
 
-        self.bind_event_handlers()
-        self.components = [
-            self.header,
-            self.connection_string,
-            self.table_name,
-            self.image_metadata_column,
-            self.image_bytes_column,
-            self.connection_result_textarea,
-            self.test_button
-        ]
+        shared.options_templates.update(
+            shared.options_section(
+                ('nex-databases', "Nex databases"), {
+                    f'nex_databases_enable_sqlite': shared.OptionInfo(False, 'Enable - SQLite'),
+                    f'nex_databases_connection_string_sqlite': shared.OptionInfo(
+                        "", 'Connection String - SQLite', gr.Textbox,
+                        {'placeholder': 'sqlite:///your_database_file.db'}
+                    ),
+                    f'nex_databases_table_sqlite': shared.OptionInfo("", 'Table Name - SQLite'),
+                    f'nex_databases_metadata_sqlite': shared.OptionInfo("", 'Image Metadata Column Name - SQLite'),
+                    f'nex_databases_bytes_sqlite': shared.OptionInfo("", 'Image Bytes Column Name - SQLite'),
+                    f'nex_databases_test_button_sqlite': OptionButton('Test - SQLite!', self.test_connectivity),
+                }
+            )
+        )
 
-    def bind_event_handlers(self):
-        self.test_button.click(fn=self.test_connectivity, inputs=[self.connection_string], outputs=[self.connection_result_textarea])
-
-    def instance(self, connection_string):
-        self.connection = create_engine(connection_string)
+    def instance(self):
+        self.connection = create_engine(shared.opts.nex_databases_connection_string_sqlite)
         Session = sessionmaker(bind=self.connection)
         self.session_instance = Session()
 
-    def test_connectivity(self, connection_string):
+    def test_connectivity(self):
         message = ""
         try:
-            self.instance(connection_string)
+            self.instance()
             with self.connection.connect() as conn:
                 conn.execute(text("SELECT 1"))
-            message = f"Connected successfully to {self.name}!\n"
+            message = f"Connected successfully to {self.name}!"
+            gr.Info(message)
         except Exception as e:
             message = f"Error connecting to {self.name}: {str(e)}"
+            gr.Warning(message)
         finally:
             self.close()
             return message
 
-    def insert(self, processed, input_values):
+    def insert(self, processed):
+        if not shared.opts.nex_databases_enable_sqlite:
+            return
 
-        # These input values are obtained in order from self.components.
-        # This was how stable-diffusion was designed when returning values from various inputs.
-        connection_string, table_name, image_metadata_column, image_bytes_column = input_values[1:5]
+        table_name = shared.opts.nex_databases_table_sqlite
+        image_metadata_column = shared.opts.nex_databases_metadata_sqlite
+        image_bytes_column = shared.opts.nex_databases_bytes_sqlite
 
-        self.instance(connection_string)
+        self.instance()
 
         try:
             table = self.get_or_create_table(table_name, image_metadata_column, image_bytes_column)

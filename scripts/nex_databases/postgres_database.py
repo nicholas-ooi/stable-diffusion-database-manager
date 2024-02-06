@@ -32,6 +32,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import logging
 from modules import generation_parameters_copypaste
+from modules import shared
+from .setting_button import OptionButton
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,51 +49,50 @@ class PostgresDatabase:
     components = None
 
     def __init__(self):
-        self.header = gr.Label(label=self.name, value=self.name, visible=False)
-        self.connection_string = gr.Textbox(label="Connection String", visible=False, placeholder="postgresql://postgres:your_password@localhost:5432/your_database_name")
-        self.table_name = gr.Textbox(label="Table Name", visible=False, placeholder="Provide the name of the table")
-        self.image_metadata_column = gr.Textbox(label="Image Metadata Column Name", visible=False, placeholder="Provide the name of the column that stores the image metadata details")
-        self.image_bytes_column = gr.Textbox(label="Image Bytes Column Name", visible=False, placeholder="Provide the name of the column that stores the image")
-        self.connection_result_textarea = gr.TextArea(interactive=False, label='Connection Result', visible=False)
-        self.test_button = gr.Button(value="Test Connection", visible=False)
+        pass
 
-        self.bind_event_handlers()
-        self.components = [
-            self.header,
-            self.connection_string,
-            self.table_name,
-            self.image_metadata_column,
-            self.image_bytes_column,
-            self.connection_result_textarea,
-            self.test_button
-        ]
+        shared.options_templates.update(
+            shared.options_section(
+                ('nex-databases', "Nex databases"), {
+                    f'nex_databases_enable_postgre': shared.OptionInfo(False, 'Enable - PostgreSQL'),
+                    f'nex_databases_connection_string_postgre': shared.OptionInfo(
+                        "", 'Connection String - PostgreSQL', gr.Textbox,
+                        {'placeholder': 'postgresql://postgres:your_password@localhost:5432/your_database_name'}
+                    ),
+                    f'nex_databases_table_postgre': shared.OptionInfo("", 'Table Name - PostgreSQL'),
+                    f'nex_databases_metadata_postgre': shared.OptionInfo("", 'Image Metadata Column Name - PostgreSQL'),
+                    f'nex_databases_bytes_postgre': shared.OptionInfo("", 'Image Bytes Column Name - PostgreSQL'),
+                    f'nex_databases_test_button_postgre': OptionButton('Test - PostgreSQL!', self.test_connectivity),
+                }
+            )
+        )
 
-    def bind_event_handlers(self):
-        self.test_button.click(fn=self.test_connectivity, inputs=[self.connection_string], outputs=[self.connection_result_textarea])
-
-    def instance(self, connection_string):
-        self.connection = create_engine(connection_string)
+    def instance(self):
+        self.connection = create_engine(shared.opts.nex_databases_connection_string_postgre)
         Session = sessionmaker(bind=self.connection)
         self.session_instance = Session()
 
-    def test_connectivity(self, connection_string):
-        message = ""
+    def test_connectivity(self):
         try:
-            self.instance(connection_string)
+            self.instance()
             with self.connection.connect() as conn:
                 conn.execute(text("SELECT 1"))
-            message = f"Connected successfully to {self.name}!\n"
+            message = f"Connected successfully to {self.name}!"
+            gr.Info(message)
         except Exception as e:
             message = f"Error connecting to {self.name}: {str(e)}"
+            gr.Warning(message)
         finally:
             self.close()
-            return message
 
-    def insert(self, processed, input_values):
+    def insert(self, processed):
+        if not shared.opts.nex_databases_enable_postgre:
+            return
 
-        connection_string, table_name, image_metadata_column, image_bytes_column = input_values[1:5]
-
-        self.instance(connection_string)
+        table_name = shared.opts.nex_databases_table_postgre
+        image_metadata_column = shared.opts.nex_databases_metadata_postgre
+        image_bytes_column = shared.opts.nex_databases_bytes_postgre
+        self.instance()
 
         try:
             table = self.get_or_create_table(table_name, image_metadata_column, image_bytes_column)
