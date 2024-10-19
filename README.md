@@ -10,8 +10,6 @@
 
 ## Introduction
 
-![Introductory image](README_images/stable-diffusion-database-manager-1.png) <!-- Replace with your introductory image -->
-
 Stable Diffusion Database Manager named Nex is a Stable Diffusion extension.  
 It supports generating of a single or in batches of images that will be inserted into a single or multiple databases.  
 The extension is built using the existing stable diffusion webUI gradio UI framework.   
@@ -21,7 +19,7 @@ It supports 4 different types of databases such as:
 1. Postgres (RDBMS, SQL)
 1. Neo4j + IPFS (Graph, CQL)
 1. MongoDB (Document, NoSQL)
-1. SQlite (**new**)
+1. SQlite
 
 ### Use Cases
 
@@ -75,10 +73,17 @@ Alternatively, is to git clone or download this repository and place everything 
 
 
 ### Using the extension
-When setting up and selecting one or more databases  
-Check the connection String and ensure the database schema is created.  
-Always hit the test connectivity button to ensure the extension is able to connect with the respective database before inserting the images.  
-Tables, columns, and collections are created on the fly if they do ``not exist`` in the database when images are generated.  
+
+
+![Introductory image](README_images/stable-diffusion-database-manager-1.png) <!-- Replace with your introductory image -->
+
+1. Go to Settings tab  
+1. Find for Nex databases within Uncategorized section  
+1. When setting up and enabling one or more databases  
+1. Always save your changes by hitting the button **Apply Settings**  
+1. Check the connection String and ensure the database schema is created.  
+1. Test connectivity button to ensure extension is able to connect with the respective database.  
+1. Tables, columns, and collections are created on the fly if they do ``not exist`` in the 1. database when images are generated.  
 
 Refer to **Test and Adminer UI** to access the various database types to create a database.
 
